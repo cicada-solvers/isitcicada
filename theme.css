@@ -1,0 +1,63 @@
+@font-face {
+  font-family: 'FuturaPT';
+  src:  url('futura_pt.ttf') format('truetype'),
+        url('futura_ptb.otf') format('opentype');
+
+}
+
+
+*{
+	color:#ffffff;
+	background-color:#000000;
+	font-family: 'FuturaPT', Fallback, sans-serif;
+}
+
+
+body{
+	position:absolute;
+	left:0;
+	right:0;
+	top:0;
+	bottom:0;
+	width:100%;
+	height:100%;
+}
+textarea{
+	resize: none;
+	background-image: url('logo.jpg');
+    background-repeat: no-repeat;
+    background-attachment: fixed;
+    background-position: center;
+}
+
+
+#loadcover{
+	display:block;
+	position:absolute;
+	top:0;
+	bottom:0;
+	left:0;
+	right:0;
+	opacity:0.8
+}
+
+.flex-container {
+    display: flex;
+    flex-direction: column;
+    flex-wrap: nowrap;
+    justify-content: flex-start;
+    align-content: flex-start;
+    align-items: stretch;
+}
+
+.flex-item:nth-child(1) {
+    order: 0;
+    flex: 0 1 10px;
+    align-self: auto;
+}
+
+.flex-item:nth-child(2) {
+    order: 0;
+    flex: 1 1 10px;
+    align-self: auto;
+}
