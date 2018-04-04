@@ -61,3 +61,32 @@ textarea{
     flex: 1 1 10px;
     align-self: auto;
 }
+
+
+
+.head-flex-container {
+    display: flex;
+    flex-direction: row;
+    flex-wrap: nowrap;
+    justify-content: flex-start;
+    align-content: flex-start;
+    align-items: stretch;
+    }
+
+.head-flex-item:nth-child(1) {
+    order: 0;
+    flex: 1 1 auto;
+    align-self: auto;
+    }
+
+.head-flex-item:nth-child(2) {
+    order: 0;
+    flex: 0 1 auto;
+    align-self: auto;
+    }
+
+.head-flex-item:nth-child(3) {
+    order: 0;
+    flex: 1 1 auto;
+    align-self: auto;
+    }
