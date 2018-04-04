@@ -62,7 +62,10 @@ textarea{
     align-self: auto;
 }
 
-
+.textright{
+	text-align:right;
+	vertical-align:middle;
+}
 
 .head-flex-container {
     display: flex;
