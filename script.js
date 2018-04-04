@@ -49,6 +49,9 @@ function input_check_changed(){
 }
 
 
+
+
+
 function input_verify(){
 	//console.log('verifying...2')
 	var pubkeyobj = pgputil.get_pub('6d854cd7933322a601c3286d181f01e57a35090f')
@@ -63,13 +66,13 @@ function input_verify(){
 }
 function input_verified(validity,verified,error){
 	if(validity===true){
-		window.input_check=false;
-		var newmsg = "*** RAW DATA SIGNED: \r\n"+verified.data;
-		$('#input_text').val(newmsg)
-		$('#result_text').html('<span style="color:green">YES</span>');
-		window.input_hash=$('#input_text').val().hashCode();
-		window.input_dirty=false;
-		window.input_check=true;
+		//window.input_check=false;
+		//var newmsg = "*** RAW DATA SIGNED: \r\n"+verified.data;
+		//$('#input_text').val(newmsg)
+		$('#result_text').html('<span style="color:green">YES - Good Signature</span>');
+		//window.input_hash=$('#input_text').val().hashCode();
+		//window.input_dirty=false;
+		//window.input_check=true;
 	}else{//could decode but not verify - usually because a different (incorrect) key signed the message. we can check if this is the case.
 		switch(error){
 			case 1:
@@ -107,8 +110,6 @@ function load_key(){
 	  success: function(response){
 		window.testx=response;
 		pgputil.add_pubkey(response);
-		console.log('bob')
-		//alert('bob')
 		input_setup_actions();
 		preload_finish();
 		$('#input_text').focus();
