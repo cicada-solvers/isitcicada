@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<title>Is It Cicada?</title>
+		<meta charset="UTF-8">
+		<link rel="stylesheet" type="text/css" href="reset.css">
+		<link rel="stylesheet" type="text/css" href="theme.css">
+		<script src="jquery-3.2.1.min.js"></script>
+	</head>
+	<body class="flex-container">
+		<div class="flex-item head-flex-container">
+
+		<div class="head-flex-item"></div>
+		<div class="head-flex-item"><center><h1>Is It Cicada?</h1><h2 id="result_text">&nbsp;</h2></center></div>
+		<div class="head-flex-item textright"><span class="links"><a href="index.html">main</a> &bull; about</span></div>
+		</div>
+		<div class="flex-item">
+			<ul class="faq">
+				<li><span>What is this?</span><p>
+					Part of PGP presents a standard for how a private key can be used in conjunction with a cryptographic hash to sign a message in a way with which the author's public key can be used
+					to verify that signature was made by them.
+					'Is It Cicada' is a web-app that automatically checks PGP-signed text against the oldest known PGP key for the group known as Cicada 3301. The app is fully
+					<a href="https://github.com/crashdemons/isitcicada">open-source</a>.
+				</p><p>
+					'Is It Cicada' is not owned or operated or made in association with Cicada 3301, but serves to provide a useful verification for multiple platforms.
+				</p></li>
+
+				<li><span>How do I use it?</span><p>
+					Very simply - using a message you believe was signed inline by Cicada 3301 (for example: PGP BEGIN MESSAGE, etc lines appear alongside an actual message), you can copy this message
+					and paste it into the text box for 'Is It Cicada'. Immediately afterwards, 'Is It Cicada' will attempt to verify the message against Cicada 3301's public key - giving you a definitive
+					"YES" or "NO" whether the message is authentic.
+				</p></li>
+
+				<li><span>Why is this necessary?</span><p>
+					'Is It Cicada' was designed for the purpose of being easy to use and to provide reliability through a strict OpenPGP implementation, as well as handling some common failings.
+				</p><p>
+					In particular, users may be unwilling to unable to install software like GPG (GNU Privacy Guard, a command-line implementation of PGP) which shows
+					full warning information, but has a bit of a learning curve in order to use it [such as identifying common warnings, correct key trust levels, identifying keyids, etc].
+					Other, easier to use software such as Kleopatra and Enigmail fail to display important warnings about the message to the user.
+				</p></li>
+
+				<li><span>How does this app work?</span><p>
+					Everything in this app is done client-side by OpenPGP.js after the the public key is loaded.
+					OpenPGP.js permits verifying ascii-armor messages against a public key without any work on the server side.
+				</p></li>
+
+				<li><span>What kind of warnings do other programs fail to take into account?</span><p>
+					In specific, the 'invalid clearsig header' message provided by GPG is not present in some PGP-enabled programs. This message generally occurs if text or an invalid header line
+					has been inserted after the Hash header, but before the message actually starts.  In practice, this means this line of text is not actually part of the message, but instead is metadata
+					and is not considered when determining its validity / signature in some programs - presenting a "good signature" response, and causing users to think the line of text was from the author.
+				</p><p>
+					In GPG, this situation produces a warning line and verifies the signature separately - which can still cause confusion for untrained eyes.
+					While 'Is It Cicada' offers a clear, easy way to test these messages - learning to use GPG yourself is still strongly recommended.
+				</p></li>
+
+				<li><span>How does this app handle these special cases better?</span><p>
+					OpenPGP.js is very strict about cleartext signature formats. Any invalid headers added to messages cause the message to be considered invalid as a whole, which is ideal when you
+					want to determine attribution of a message as a whole.
+				</p><p>
+					In addition, when using other software you can have cases where the trust-model fails you (where if you trust one key fully, you trust another implicitly) or the issues with key selection
+					(where the 'short id' appears the same as another key on an online service, making it difficult to choose the right one) - any trusted key can be used when verifying in most programs.
+					'Is It Cicada' overcomes these issues by selecting the oldest
+					documented cicada 3301 key based on the full fingerprint (6D854CD7933322A601C3286D<u>181F01E57A35090F</u>, keyid 0x181F01E57A35090F) and by not employing any additional implicit trust, you can
+					be sure that the message is only verified against the single key listed here.
+				</p></li>
+
+				<li><span>I'm getting "Malformed message" or "No valid signature" errors - what does this mean?</span><p>
+					Messages that produce this error mean that either they were not understood as a proper PGP-signed message, or they have been modified (for example, with text added in the header,
+					or you missed a character when copying). Modified messages cannot be confirmed to be by the original author.
+				</p><p>
+					If you think this is a mistake, double-check that you copied the message properly, and that none of the data was changed by text-formatting and try copying and pasting it into 'Is It Cicada' again.
+				</p></li>
+
+			</ul>
+		</div>
+	</body>
+</html>
