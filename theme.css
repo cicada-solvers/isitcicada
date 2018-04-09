@@ -89,6 +89,10 @@ ul.faq p{
 	text-align:right;
 	vertical-align:middle;
 }
+.textright .links{
+	padding-top:5px;
+	padding-right:5px;
+}
 
 .head-flex-container {
     display: flex;
