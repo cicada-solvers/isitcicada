@@ -5,14 +5,12 @@
 
 }
 
-
 *{
-	color:#ffffff;
-	background-color:#000000;
 	font-family: 'FuturaPT', Fallback, sans-serif;
 }
-
-
+a{
+	color:white;
+}
 body{
 	position:absolute;
 	left:0;
@@ -21,13 +19,17 @@ body{
 	bottom:0;
 	width:100%;
 	height:100%;
+	color:#ffffff;
+	background-color:#000000;
 }
 textarea{
 	resize: none;
+	background-color:#000000;
 	background-image: url('logo.jpg');
     background-repeat: no-repeat;
     background-attachment: fixed;
     background-position: center;
+	color:#ffffff;
 }
 
 
