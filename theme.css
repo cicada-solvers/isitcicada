@@ -75,7 +75,7 @@ ul.faq p{
 
 .flex-item:nth-child(1) {
     order: 0;
-    flex: 0 1 auto;
+    flex: 0 0 60px;
     align-self: auto;
 }
 
@@ -101,18 +101,18 @@ ul.faq p{
 
 .head-flex-item:nth-child(1) {
     order: 0;
-    flex: 1 1 auto;
+    flex: 1 1 110px;
     align-self: auto;
     }
 
 .head-flex-item:nth-child(2) {
     order: 0;
-    flex: 0 1 auto;
+    flex: 0 1 200px;
     align-self: auto;
     }
 
 .head-flex-item:nth-child(3) {
     order: 0;
-    flex: 1 1 auto;
+    flex: 1 1 110px;
     align-self: auto;
     }
