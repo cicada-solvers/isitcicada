@@ -57,7 +57,6 @@ var pgputil={
 	is_keyobj_private:function(keyobj){
 		if(keyobj.keys.length===0) return false;
 		return keyobj.keys[0].isPrivate();
-		//return hasOwnProperty.call(keyobj.keys[0].primaryKey,'isDecrypted');
 	},
 	save_keys_to:function(keyname,keylistobject){
 		localStorage.setItem('htmlpgp.'+keyname,JSON.stringify(keylistobject));
@@ -101,12 +100,10 @@ var pgputil={
 			if(this.is_keyobj_private(opub))
 				return false;
 			this.pubkeys[fp]=strPubkey;
-			//this.pubkeys.length++;
 			this.save_keys();
 			return fp;
 		}else return false;
 		return true;
-		//opub.keys[0].primaryKey.fingerprint
 	},
 	add_privkey:function(strPubkey){
 		var opub = openpgp.key.readArmored(strPubkey);
@@ -115,22 +112,18 @@ var pgputil={
 			if(!this.is_keyobj_private(opub))
 				return false;
 			this.privkeys[fp]=strPubkey;
-			//this.privkeys.length++;
 			this.save_keys();
 			return fp;
 		}else return false;
 		return true;
-		//opub.keys[0].primaryKey.fingerprint
 	},
 	remove_pubkey:function(fp){
 		if(typeof this.pubkeys[fp] === 'undefined') return null;
-		//this.pubkeys.length--;
 		delete this.pubkeys[fp];
 		this.save_keys();
 	},
 	remove_privkey:function(fp){
 		if(typeof this.privkeys[fp] === 'undefined') return null;
-		//this.privkeys.length--;
 		delete this.privkeys[fp];
 		this.save_keys();
 	},
@@ -179,22 +172,12 @@ var pgputil={
 		return openpgp.sign(options).then(callback_signed);
 	},
 	sign_data_binary:function(sdata,unlocked_privobj,callback_signed){
-		console.log(sdata);
 		var msg = openpgp.message.fromBinary(sdata)
-		console.log(msg);
-		//var pubKey2 = openpgp.key.readArmored(pub_key_arm2).keys[0];
 		var privKey2 = unlocked_privobj.keys[0];
-		//privKey2.decrypt('hello world');
 		var sig = msg.signDetached([privKey2]);
 		var obj={signature:sig.armor()};
 		callback_signed(obj);
 
-		//var opt = {numBits: 512, userIds: { name:'test', email:'a@b.com' }, passphrase: null};
-		//if (openpgp.util.getWebCryptoAll()) { opt.numBits = 2048; } // webkit webcrypto accepts minimum 2048 bit keys
-		//return openpgp.generateKey(opt).then(function(gen) {
-		//	  var generatedKey = gen.key;
-		//	  var detachedSig = msg.signDetached([generatedKey, privKey2]);
-		//});
 	},
 	encrypt_data_binary:function(bdata,destination_pubobj,unlocked_privobj,callback_signed){
 		var privKeyObj=unlocked_privobj.keys[0];
@@ -207,11 +190,7 @@ var pgputil={
 			armor: false                              // don't ASCII armor (for Uint8Array output)
 		};
 
-		openpgp.encrypt(options).then(callback_signed);/*function(ciphertext) {
-			console.log(ciphertext);
-			console.log(ciphertext.data);
-			encrypted = ciphertext.data;//message.packets.write(); // get raw encrypted packets as Uint8Array
-		});*/
+		openpgp.encrypt(options).then(callback_signed);
 	},
 	verify_text:function(cleartext,pubobj,callback_verified){
 	//checks a clearsigned armor message against a pubkeyobj and calls a callback with the result
@@ -238,74 +217,11 @@ var pgputil={
 				if(validity===null) error=2;
 			}
 			if(validity===null) validity=false;
-			//validity = verified.signatures[0].valid; // true
-			//if (validity) {
-				//console.log('signed by key id ' + verified.signatures[0].keyid.toHex());
-			//}
 			callback_verified(validity,verified,error);
 		});
 		return result;
-		//console.log("verification result: "+result);
 	}
 }
-/*
-Object.defineProperty(pgputil.privkeys, "length", {
-    enumerable: false,
-    writable: true
-});
-Object.defineProperty(pgputil.pubkeys, "length", {
-    enumerable: false,
-    writable: true
-});
-*/
-
-
-
-/*
-function pgp_create_userid(name,email){
-	return [{name:name,email:email}];
-}
-
-
-//note: returns a promise that must be accessed async with .then(function(key)...);
-//var privkey = key.privateKeyArmored; // '-----BEGIN PGP PRIVATE KEY BLOCK ... '
-//var pubkey = key.publicKeyArmored;   // '-----BEGIN PGP PUBLIC KEY BLOCK ... '
-function pgp_generate_keys(numBits,userIds,passphrase=''){
-var options = {
-    userIds: userIds, // multiple user IDs
-    numBits: numBits,                                         // RSA key size
-    passphrase: passphrase         // protects the private key
-};
-
-return openpgp.generateKey(options);
-}
-
-
-
-
-function pgp_sign_message(privkey, message, passphrase=''){
-	var privKeyObj = openpgp.key.readArmored(privkey).keys[0];
-	options = {
-   	 data: message,                             // input as String (or Uint8Array)
-  	  privateKeys: privKeyObj // for signing
-	};
-
-	return openpgp.sign(options);
-}
-
-
-
-function pgp_test(){
-	var userids = pgp_create_userid('test','test@test.com');
-	pgp_generate_keys(2048,userids,'password').then(function(keyobj){
-		window.keyobj=keyobj;
-		window.privkeystr=keyobj.privateKeyArmored;
-		window.privKeyObj = openpgp.key.readArmored(window.privkeystr).keys[0];
-		console.log(window.privKeyObj.decrypt('password'));
-	});
-}
-
-*/
 
 
 
