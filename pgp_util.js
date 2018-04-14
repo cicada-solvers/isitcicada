@@ -1,38 +1,4 @@
 
-window.pubkeytest="";
-window.invalidkeytest="";
-window.privkeytest="";
-
-$.ajax({
-  url: "test_pub_key.txt",
-  data: '',
-  dataType: 'text',
-  success: function(response){
-	window.pubkeytest=response;
-  }
-});
-$.ajax({
-  url: "test_priv_key.txt",
-  data: '',
-  dataType: 'text',
-  success: function(response){
-	window.privkeytest=response;
-  }
-});
-$.ajax({
-  url: "test_invalid_key.txt",
-  data: '',
-  dataType: 'text',
-  success: function(response){
-	window.invalidkeytest=response;
-  }
-});
-
-
-
-
-
-
 var pgputil={
 	pubkeys:{},
 	privkeys:{},
@@ -71,10 +37,6 @@ var pgputil={
 		this.pubkeys=this.load_keys_from('pubkeys');
 		this.privkeys=this.load_keys_from('privkeys');
 		this.default_fingerprint = localStorage.getItem('htmlpgp.defaultfp');
-		if(this.pubkeys_length()===0 && this.privkeys_length()===0){
-			this.add_pubkey(pubkeytest);
-			this.add_privkey(privkeytest);
-		}
 	},
 	set_default:function(fp){
 		this.default_fingerprint = fp;
