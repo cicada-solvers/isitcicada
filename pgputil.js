@@ -185,7 +185,7 @@ var pgputil={
 	},
 
 	//encrypt data with a decrypted priv keyobject intended for a destination pub keyobject to read and call 'callback_signed' with the results
-	//the callback will receive an object with ascii-armored message stored in callbackargument.data
+	//the callback will receive an object with encrypted message stored in callbackargument.data
 	encrypt_data_binary:function(bdata,destination_pubobj,unlocked_privobj,callback_signed){
 		var privKeyObj=unlocked_privobj.keys[0];
 		var options, encrypted;
