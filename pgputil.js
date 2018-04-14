@@ -170,7 +170,6 @@ var pgputil={
 		  privateKeys: privKeyObj, // for signing
 		  detached:detach
 		};
-		console.log(options);
 		return openpgp.sign(options).then(callback_signed);
 	},
 
@@ -216,7 +215,6 @@ var pgputil={
 			publicKeys: pubobj.keys   // for verification
 		};//NOTE: only exceptions from Read will be caught from this function
 		var result=openpgp.verify(options).then(function(verified) {
-			console.log(verified);
 			var validity=null;
 			var error=0;
 			if(typeof verified !== 'object'){
