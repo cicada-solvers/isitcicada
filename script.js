@@ -56,11 +56,13 @@ function input_verify(){
 	var text = $("#input_text").val();
 	$('#result_text').html('&nbsp;');
 	try{
-		pgputil.verify_text(text,pubkeyobj, input_verified);
+		return pgputil.verify_text(text,pubkeyobj, input_verified);
 	}catch(err){
 		input_failed(err,text);
+		return 'error';
 	}
 }
+
 function input_verified(validity,verified,error){
 	if(validity===true){
 		$('#result_text').html('<span style="color:green">YES - Good Signature</span>');
