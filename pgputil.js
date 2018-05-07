@@ -227,6 +227,7 @@ var pgputil={
 			}
 			if(validity===null) validity=false;
 			callback_verified(validity,verified,error);
+			return validity;
 		});
 		return result;
 	}
