@@ -84,7 +84,7 @@ function input_verified(validity,verified,error){
 	}
 }
 function input_failed(err,text){
-	if(err.message="Unknown ASCII armor type"){
+	if(err.message=="Unknown ASCII armor type"){
 		if(text.length===0) err.message="&nbsp;";
 		else err.message='Malformed ASCII armor message';
 	}
