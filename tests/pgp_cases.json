@@ -11,5 +11,6 @@
 	{"id":9,"name":"PGP Message - Signature passes integrity check but not malformed","expectation":false},
 	{"id":10,"name":"PGP Message - Arbitrary headers in signature","expectation":false},
 	{"id":11,"name":"PGP Message - Good signature from wrong key","expectation":false},
-	{"id":12,"name":"PGP Message - Completely invalid data (sanity check)","expectation":"error"}
+	{"id":12,"name":"PGP Message - Completely invalid data (sanity check)","expectation":"error"},
+	{"id":13,"name":"PGP Message - Valid message","expectation":true}
 ]
