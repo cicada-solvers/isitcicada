@@ -248,6 +248,7 @@ var pgputil={
 		for(var i=0;i<lines.length;i++){
 			var precontext=context;
 			var line = lines[i];
+			line = line.replace(/\s+$/g, '');//right-trim whitespace from end of line
 
 			if(context==="outside-before" && line==="-----BEGIN PGP SIGNED MESSAGE-----"){//if we're outside and encounter a BEGIN, then we're in the preamble (containing headers)
 				context="msg-headers";
@@ -265,7 +266,7 @@ var pgputil={
 				context="outside-after";
 			}
 
-			//console.log("`"+line+"` "+line.length+" "+(line==="")+"  ["+precontext+" -> "+context+"]");
+			console.log("`"+line+"` "+line.length+" "+(line==="")+"  ["+precontext+" -> "+context+"]");
 		}
 		if(context!=="outside-after") return 1003;
 		return 0;
