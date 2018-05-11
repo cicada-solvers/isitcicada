@@ -78,6 +78,15 @@ function input_verified(validity,verified,error){
 			case 3:
 				$('#result_text').html('<span style="color:orange">NO - Error processing message</span>');
 				break;
+			case 1001:
+				$('#result_text').html('<span style="color:orange">NO - Invalid Message Header</span>');
+				break;
+			case 1002:
+				$('#result_text').html('<span style="color:orange">NO - Invalid Signature Header</span>');
+				break;
+			case 1003:
+				$('#result_text').html('<span style="color:orange">NO - Invalid Formatting</span>');
+				break;
 			default:
 				$('#result_text').html('<span style="color:red">NO - Bad Signature for this message</span>');
 		}
