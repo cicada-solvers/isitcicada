@@ -87,6 +87,9 @@ function input_verified(validity,verified,error){
 			case 1003:
 				$('#result_text').html('<span style="color:orange">NO - Invalid Formatting</span>');
 				break;
+			case 1004:
+				$('#result_text').html('<span style="color:orange">NO - Conflicting Hash header values</span>');
+				break;
 			default:
 				$('#result_text').html('<span style="color:red">NO - Bad Signature for this message</span>');
 		}
