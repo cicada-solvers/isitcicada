@@ -7,7 +7,7 @@
 	{"id":6,"name":"PGP Message - Signature begin malformed","expectation":false},
 	{"id":7,"name":"PGP Message - Signature ending malformed","expectation":false},
 	{"id":8,"name":"PGP Message - Modified message (bad sig)","expectation":false},
-	{"id":9,"name":"PGP Message - Signature passes integrity check but not malformed","expectation":false},
+	{"id":9,"name":"PGP Message - Signature passes integrity check but not valid","expectation":false},
 	{"id":10,"name":"PGP Message - Arbitrary headers in signature","expectation":false},
 	{"id":11,"name":"PGP Message - Good signature from wrong key","expectation":false},
 	{"id":12,"name":"PGP Message - Completely invalid data (sanity check)","expectation":"error"},
