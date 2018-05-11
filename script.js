@@ -41,7 +41,7 @@ function input_check_changed(){
 	if(!window.input_check) return;
 	var newhash = $("#input_text").val().hashCode();
 	if(window.input_hash!==newhash){
-		console.log(window.input_hash+ " !== "+newhash)
+		//console.log(window.input_hash+ " !== "+newhash)
 		window.input_hash = newhash;
 		window.input_dirty=true;
 	}

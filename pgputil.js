@@ -279,7 +279,7 @@ var pgputil={
 	},
 	verify_text_header:function(header,dest_object=null){
 		parts = header.split(": ");
-		console.log(parts);
+		//console.log(parts);
 		if(parts.length<2) return false;
 		if(parts[0]!=="Hash" && parts[0]!=="Version" && parts!=="Comment") return false;
 		if(dest_object!==null){
