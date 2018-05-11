@@ -1,5 +1,4 @@
 [
-	{"id":0,"name":"PGP Message - A valid message","expectation":true},
 	{"id":1,"name":"PGP Message - Invalid Hash type","expectation":"error"},
 	{"id":2,"name":"PGP Message - Mismatched Hash type","expectation":"error"},
 	{"id":3,"name":"PGP Message - Invalid header name","expectation":"error"},
@@ -12,5 +11,12 @@
 	{"id":10,"name":"PGP Message - Arbitrary headers in signature","expectation":false},
 	{"id":11,"name":"PGP Message - Good signature from wrong key","expectation":false},
 	{"id":12,"name":"PGP Message - Completely invalid data (sanity check)","expectation":"error"},
-	{"id":13,"name":"PGP Message - Valid message","expectation":true}
+	{"id":0,"name":"PGP Message - A valid message","expectation":true},
+	{"id":13,"name":"PGP Message - Valid message","expectation":true},
+	{"id":14,"name":"PGP Message - Valid message","expectation":true},
+	{"id":15,"name":"PGP Message - Valid message","expectation":true},
+	{"id":16,"name":"PGP Message - Valid message","expectation":true},
+	{"id":17,"name":"PGP Message - Valid message","expectation":true},
+	{"id":18,"name":"PGP Message - Valid message","expectation":true},
+	{"id":19,"name":"PGP Message - Valid message","expectation":true}
 ]
