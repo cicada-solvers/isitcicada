@@ -41,7 +41,7 @@ function input_check_changed(){
 	if(!window.input_check) return;
 	var newhash = $("#input_text").val().hashCode();
 	if(window.input_hash!==newhash){
-		console.log(window.input_hash+ " !== "+newhash)
+		//console.log(window.input_hash+ " !== "+newhash)
 		window.input_hash = newhash;
 		window.input_dirty=true;
 	}
@@ -56,11 +56,13 @@ function input_verify(){
 	var text = $("#input_text").val();
 	$('#result_text').html('&nbsp;');
 	try{
-		pgputil.verify_text(text,pubkeyobj, input_verified);
+		return pgputil.verify_text(text,pubkeyobj, input_verified);
 	}catch(err){
 		input_failed(err,text);
+		return 'error';
 	}
 }
+
 function input_verified(validity,verified,error){
 	if(validity===true){
 		$('#result_text').html('<span style="color:green">YES - Good Signature</span>');
@@ -76,13 +78,25 @@ function input_verified(validity,verified,error){
 			case 3:
 				$('#result_text').html('<span style="color:orange">NO - Error processing message</span>');
 				break;
+			case 1001:
+				$('#result_text').html('<span style="color:orange">NO - Invalid Message Header</span>');
+				break;
+			case 1002:
+				$('#result_text').html('<span style="color:orange">NO - Invalid Signature Header</span>');
+				break;
+			case 1003:
+				$('#result_text').html('<span style="color:orange">NO - Invalid Formatting</span>');
+				break;
+			case 1004:
+				$('#result_text').html('<span style="color:orange">NO - Conflicting Hash header values</span>');
+				break;
 			default:
 				$('#result_text').html('<span style="color:red">NO - Bad Signature for this message</span>');
 		}
 	}
 }
 function input_failed(err,text){
-	if(err.message="Unknown ASCII armor type"){
+	if(err.message=="Unknown ASCII armor type"){
 		if(text.length===0) err.message="&nbsp;";
 		else err.message='Malformed ASCII armor message';
 	}

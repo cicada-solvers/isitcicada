@@ -210,6 +210,7 @@ var pgputil={
 	//the calback will receive the validity, a verification result object, and the error code
 	// the verification object holds a list of signatures in verobj.signatures, of which you can check the validity with verobj.signatures[i].valid
 	verify_text:function(cleartext,pubobj,callback_verified){
+		var formaterror = this.verify_text_format(cleartext);
 		options = {
 			message: openpgp.cleartext.readArmored(cleartext), // parse armored message
 			publicKeys: pubobj.keys   // for verification
@@ -225,11 +226,70 @@ var pgputil={
 				validity = verified.signatures[0].valid;
 				if(validity===null) error=2;
 			}
+
+
+			if(formaterror!==0){
+				validity=false;
+				error=formaterror;
+			}
+
 			if(validity===null) validity=false;
 			callback_verified(validity,verified,error);
+			return validity;
 		});
 		return result;
+	},
+
+	//checks a clearsigned armor message for discrepancies in formatting that are ignored by OpenPGP.js
+	verify_text_format:function(cleartext){
+		var cleartext = cleartext.replace(/\/r/g, '');//remove Carriage Returns so that we can split the message by linefeeds
+		var lines = cleartext.split("\n");
+		var context = "outside-before";
+		var hash="";//current hash for the message - can be unset but cannot conflict between headers.
+		for(var i=0;i<lines.length;i++){
+			var precontext=context;
+			var line = lines[i];
+			line = line.replace(/\s+$/g, '');//right-trim whitespace from end of line
+
+			//state-based parsing in normal message order (yes this looks bad, feel free to refactor this)
+			if(context==="outside-before" && line==="-----BEGIN PGP SIGNED MESSAGE-----"){//if we're outside and encounter a BEGIN, then we're in the preamble (containing headers)
+				context="msg-headers";
+			}else if(context==="msg-headers" && line!==""){//if we're in the preamble (hashes etc) and encounter a non-blank line, then it MUST be a valid header
+				var header_split = {name:"",value:""};//create object to hold results
+				if(!this.verify_text_header(line,header_split)) return 1001;//verify and split header into object
+				if(header_split.name==="Hash"){
+					if(header_split.value!==hash && hash!=="") return 1004;//if the current hash is known and this header doesn't match it - there's a conflict.
+					else hash=header_split.value;//if the hash header is not known (or inconsequentially matches the current), set the current hash to this header value
+				}
+			}else if(context==="msg-headers" && line===""){//if we're in the preamble (hashes etc) and encounter a blank line, then we're not in the message
+				context="content";
+			}else if(context==="content" && line==="-----BEGIN PGP SIGNATURE-----"){
+				context="sig-headers";
+			}else if(context==="sig-headers" && line!==""){//if we're in the signature header section and encounter a non-blank line then it MUST be a valid header
+				if(!this.verify_text_header(line)) return 1002;
+			}else if(context==="sig-headers" && line===""){//if we are in the signature header section and encounter a blank line, now we're in the signature
+				context="signature";
+			}else if(context==="signature" && line==="-----END PGP SIGNATURE-----"){
+				context="outside-after";
+			}
+			//console.log("`"+line+"` "+line.length+" "+(line==="")+"  ["+precontext+" -> "+context+"]");
+		}
+		if(context!=="outside-after") return 1003;
+		return 0;
+	},
+	verify_text_header:function(header,dest_object=null){
+		parts = header.split(": ");
+		//console.log(parts);
+		if(parts.length<2) return false;
+		if(parts[0]!=="Hash" && parts[0]!=="Version" && parts!=="Comment") return false;
+		if(dest_object!==null){
+			dest_object.name=parts[0];
+			dest_object.value=parts[1];
+		}
+		return true;
 	}
+
+
 }
 
 
