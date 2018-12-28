@@ -163,7 +163,8 @@ var pgputil={
 	//sign a string with a decrypted private keyobj and call 'callback_signed' with the resullts
 	//optionally, opt to detatch the signature.
 	//the callback will receive an object with clearsigned data in callbackargument.data (and callbackargument.signature if detached)
-	sign_data:function(sdata,unlocked_privobj,callback_signed,detach=false){
+	sign_data:function(sdata,unlocked_privobj,callback_signed,detach){
+                if(typeof detach === "undefined") detach=false;
 		var privKeyObj=unlocked_privobj.keys[0];
 		var options = {
 		 data: sdata,             // input as String (or Uint8Array)
@@ -277,7 +278,8 @@ var pgputil={
 		if(context!=="outside-after") return 1003;
 		return 0;
 	},
-	verify_text_header:function(header,dest_object=null){
+	verify_text_header:function(header,dest_object){
+                if(typeof dest_object === "undefined") dest_object=null;
 		parts = header.split(": ");
 		//console.log(parts);
 		if(parts.length<2) return false;
