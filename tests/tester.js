@@ -53,7 +53,7 @@ var tester = {
         if (test_finished !== null)
             test_finished();//foreach is synchronous so this will be when the tests are 'ran', but a test function itself may be async
     },
-    test_case: function (i, test_function, test_callback = null) {
+    test_case: function (i, test_function, test_callback) {
         if (typeof test_callback === "undefined")
             test_callback = null;
         var tester_instance = this;
