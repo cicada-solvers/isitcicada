@@ -125,11 +125,11 @@ var pgputil={
 		return openpgp.key.readArmored(this.privkeys[fp]);
 	},
 	//format a fingerprint into 4-character spacing for display purposes
-	format_fingerprint(fp){
+	format_fingerprint:function(fp){
 		return fp.toUpperCase().match(/.{1,4}/g).join(' ');
 	},
 	//format a fingerprint or longid into an 8-character shortid for display purposes.
-	format_fingerprint_shortid(fp){
+	format_fingerprint_shortid:function(fp){
 		return "0x"+fp.slice(-8);
 	},
 	//request a search for a public key on a remote keyserver (eg: pgp.mit.edu). Calls the callback function with the result.
@@ -137,7 +137,7 @@ var pgputil={
 	//	keyid = the search query succeeded and this was the first key returned.
 	//	null  = the search query returned no results
 	//	false = there was an error performing the search query
-	fetch_pub(server,squery,callback_func){
+	fetch_pub:function(server,squery,callback_func){
 		var hkp = new openpgp.HKP('https://'+server);
 		var options = {
 			query: squery
@@ -290,7 +290,7 @@ var pgputil={
 	}
 
 
-}
+};
 
 
 
