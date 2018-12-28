@@ -268,7 +268,7 @@ var pgputil = {
         var hash = "";//current hash for the message - can be unset but cannot conflict between headers.
         for (var i = 0; i < lines.length; i++) {
             var precontext = context;//unused but can be used in future processing to determine the previous context (stage/section) of data being processed.
-            var line = lines[i];out
+            var line = lines[i];
             line = line.replace(/\s+$/g, '');//right-trim whitespace from end of line
 
             //state-based parsing in normal message order (yes this looks bad, feel free to refactor this)
