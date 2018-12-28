@@ -5,7 +5,8 @@ function isPromise(value) {
 var tester = {
 	cases : [],
 	cases_ready: 0,
-	load_cases : function(url, loaded_callback=null){
+	load_cases : function(url, loaded_callback){
+                if(typeof loaded_callback==="undefined") loaded_callback=null;
 		this.cases_ready=0;
 		var tester_instance = this;
 		$.getJSON(url,null,function(data){
@@ -39,7 +40,9 @@ var tester = {
 		  }
 		});
 	},
-	test_cases : function(test_function,test_callback=null,test_finished=null){
+	test_cases : function(test_function,test_callback,test_finished){
+                if(typeof test_callback==="undefined") test_callback=null;
+                if(typeof test_finished==="undefined") test_finished=null;
 		var tester_instance = this;
 		this.cases.forEach(function(element,i){
 			tester_instance.test_case(i, test_function, test_callback);
@@ -47,6 +50,7 @@ var tester = {
 		if(test_finished!==null) test_finished();//foreach is synchronous so this will be when the tests are 'ran', but a test function itself may be async
 	},
 	test_case : function(i, test_function, test_callback=null){
+                if(typeof test_callback==="undefined") test_callback=null;
 		var tester_instance = this;
 		var test_output = test_function(this.cases[i].input);
 
