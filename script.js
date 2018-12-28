@@ -1,3 +1,9 @@
+if (typeof pgputil === "undefined") {
+    var pgputil = {};//suppress warnings in editor - doesn't change anything.
+    console.error("isitcicada code loaded before pgputil");
+}
+
+
 String.prototype.hashCode = function () {
     var hash = 0;
     for (var i = 0; i < this.length; i++) {
