@@ -194,7 +194,7 @@ var pgputil={
 	//the callback will receive an object with encrypted message stored in callbackargument.data
 	encrypt_data_binary:function(bdata,destination_pubobj,unlocked_privobj,callback_signed){
 		var privKeyObj=unlocked_privobj.keys[0];
-		var options, encrypted;
+		var options;
 
 		options = {
 			data: bdata, // input as Uint8Array (or String)
@@ -253,7 +253,7 @@ var pgputil={
 		var context = "outside-before";
 		var hash="";//current hash for the message - can be unset but cannot conflict between headers.
 		for(var i=0;i<lines.length;i++){
-			var precontext=context;
+			var precontext=context;//unused but can be used in future processing to determine the previous context (stage/section) of data being processed.
 			var line = lines[i];
 			line = line.replace(/\s+$/g, '');//right-trim whitespace from end of line
 
