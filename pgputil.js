@@ -4,6 +4,11 @@ description: wrapper class for simplified OpenPGP.js operations, and localstorag
 author(s): crashdemons
 */
 
+if(typeof openpgp === "undefined"){
+    var openpgp={};//suppress warnings in editor - doesn't change anything.
+    console.error("PGPUtil loaded before OpenPGP");
+}
+
 var pgputil={
 
 	//keyring held in memory, keys are stored as armor text, indexed by fingerprint
