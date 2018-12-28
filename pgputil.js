@@ -248,7 +248,7 @@ var pgputil={
 
 	//checks a clearsigned armor message for discrepancies in formatting that are ignored by OpenPGP.js
 	verify_text_format:function(cleartext){
-		var cleartext = cleartext.replace(/\/r/g, '');//remove Carriage Returns so that we can split the message by linefeeds
+		cleartext = cleartext.replace(/\/r/g, '');//remove Carriage Returns so that we can split the message by linefeeds
 		var lines = cleartext.split("\n");
 		var context = "outside-before";
 		var hash="";//current hash for the message - can be unset but cannot conflict between headers.
