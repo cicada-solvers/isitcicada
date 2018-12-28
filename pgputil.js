@@ -217,7 +217,7 @@ var pgputil={
 	// the verification object holds a list of signatures in verobj.signatures, of which you can check the validity with verobj.signatures[i].valid
 	verify_text:function(cleartext,pubobj,callback_verified){
 		var formaterror = this.verify_text_format(cleartext);
-		options = {
+		var options = {
 			message: openpgp.cleartext.readArmored(cleartext), // parse armored message
 			publicKeys: pubobj.keys   // for verification
 		};//NOTE: only exceptions from Read will be caught from this function
@@ -285,7 +285,7 @@ var pgputil={
 	},
 	verify_text_header:function(header,dest_object){
                 if(typeof dest_object === "undefined") dest_object=null;
-		parts = header.split(": ");
+		var parts = header.split(": ");
 		//console.log(parts);
 		if(parts.length<2) return false;
 		if(parts[0]!=="Hash" && parts[0]!=="Version" && parts!=="Comment") return false;
