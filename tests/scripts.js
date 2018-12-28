@@ -14,6 +14,8 @@ function testPgpInput(input_str,resolve,reject){
 	window.input_check=true;
 	window.input_dirty=true;
 	var retval = input_verify();
+        console.log("retval: ");
+        console.log(retval);
 	resolve(retval);
 	return retval;
 }
@@ -22,7 +24,7 @@ function testPgpInput_delayed(input_str){
 
 	window.testPgpLock = window.testPgpLock.then(function(){
 		return new Promise(function(resolve, reject) {
-			setTimeout(testPgpInput, 260, input_str, resolve,reject);
+			setTimeout(testPgpInput, 500, input_str, resolve,reject);
 		});
 	});
 	return window.testPgpLock;

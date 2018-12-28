@@ -47,9 +47,12 @@ var tester = {
         if (typeof test_finished === "undefined")
             test_finished = null;
         var tester_instance = this;
-        this.cases.forEach(function (element, i) {
+        for(var i=0;i<this.cases.length;i++){
             tester_instance.test_case(i, test_function, test_callback);
-        });
+        }
+        //this.cases.forEach(function (element, i) {
+        //    tester_instance.test_case(i, test_function, test_callback);
+        //});
         if (test_finished !== null)
             test_finished();//foreach is synchronous so this will be when the tests are 'ran', but a test function itself may be async
     },
@@ -59,7 +62,10 @@ var tester = {
         var tester_instance = this;
         var test_output = test_function(this.cases[i].input);
 
-        if (isPromise(test_output)) {//if we get a promise (async function still running), wait for the result to complete the test-case
+        console.log("test_case");
+        console.log(test_output);
+        console.log("isPromise: "+isPromise(test_output));
+        if (isPromise(test_output) || typeof test_output==="object") {//if we get a promise (async function still running), wait for the result to complete the test-case
             console.log(test_output);
             test_output.then(function (final_output) {
                 tester_instance.test_case(i, function () {
