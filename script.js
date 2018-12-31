@@ -63,47 +63,41 @@ function input_verify() {
     var pubkeyobj = pgputil.get_pub('6d854cd7933322a601c3286d181f01e57a35090f');
     var text = $("#input_text").val();
     $('#result_text').html('&nbsp;');
+    
+    return pgputil.verify_text(text,pubkeyobj,input_verified,input_failed);
+    /*
     try {
         return pgputil.verify_text(text, pubkeyobj, input_verified);
     } catch (err) {
         input_failed(err, text);
         return 'error';
-    }
+    }*/
 }
 
 function input_verified(validity, verified, error) {
     if (validity === true) {
         $('#result_text').html('<span style="color:green">YES - Good Signature</span>');
     } else {//could decode but not verify - usually because a different (incorrect) key signed the message. we can check if this is the case.
+        var color="red";
+        var message = pgputil.error.messages[error];
+        if(typeof message === "undefined") message="Unknown error "+error;
+        
         switch (error) {
-            case 1:
-                $('#result_text').html('<span style="color:orange">NO - No valid signature present</span>');
-                break;
-            case 2:
-                console.log('incorrect keyid: ' + verified.signatures[0].keyid.toHex());
-                $('#result_text').html('<span style="color:red">NO - Signed with wrong key</span>');
-                break;
-            case 3:
-                $('#result_text').html('<span style="color:orange">NO - Error processing message</span>');
-                break;
-            case 1001:
-                $('#result_text').html('<span style="color:orange">NO - Invalid Message Header</span>');
-                break;
-            case 1002:
-                $('#result_text').html('<span style="color:orange">NO - Invalid Signature Header</span>');
-                break;
-            case 1003:
-                $('#result_text').html('<span style="color:orange">NO - Invalid Formatting</span>');
-                break;
-            case 1004:
-                $('#result_text').html('<span style="color:orange">NO - Conflicting Hash header values</span>');
-                break;
-            default:
-                $('#result_text').html('<span style="color:red">NO - Bad Signature for this message</span>');
+            case pgputil.error.NONE:
+                message="Internal error (report this)";
+            case pgputil.error.VERIFY_NO_SIGNATURE:
+            case pgputil.error.VERIFY_RESULT_INVALID:
+            case pgputil.error.VERIFY_FORMAT_BAD_MESSAGE_HEADER:
+            case pgputil.error.VERIFY_FORMAT_BAD_SIG_HEADER:
+            case pgputil.error.VERIFY_FORMAT_HASH_MISMATCH:
+            case pgputil.error.VERIFY_FORMAT_INVALID:
+                color="orange";
         }
+        $('#result_text').html('<span style="color:'+color+'">NO - '+message+'</span>');
     }
 }
 function input_failed(err, text) {
+    console.log(err);
     if (err.message === "Unknown ASCII armor type") {
         if (text.length === 0)
             err.message = "&nbsp;";

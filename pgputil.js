@@ -11,6 +11,31 @@ if (typeof openpgp === "undefined") {
 
 var pgputil = {
     //keyring held in memory, keys are stored as armor text, indexed by fingerprint
+    
+    error:{
+        GIT_BITLENGTH_INVALID_KEY: "",
+        NONE:0,
+        VERIFY_NO_SIGNATURE:1,
+        VERIFY_VALIDITY_NULL:2, VERIFY_INCORRECT_KEY:2,
+        VERIFY_RESULT_INVALID:3,
+        VERIFY_RESULT_BAD_SIGNATURE:4,
+        VERIFY_FORMAT_BAD_MESSAGE_HEADER:1001,
+        VERIFY_FORMAT_BAD_SIG_HEADER:1002,
+        VERIFY_FORMAT_INVALID:1003,//generic error for incomplete messages
+        VERIFY_FORMAT_HASH_MISMATCH:1004,
+        messages:{
+            0: "Success",
+            1: "No valid signature present",
+            2: "Incorrect signature keyid (signed by someone else)",
+            3: "Error processing message",
+            4: "Bad signature (does not match message)",
+            1001: "Invalid message header",
+            1002: "Invalid signature header",
+            1003: "Invalid format",
+            1004: "Conflicting Hash header values"
+        }
+    },
+    
     pubkeys: {},
     privkeys: {},
     //default privkey index/fingerprint
@@ -35,7 +60,7 @@ var pgputil = {
             }
             return size;
         }
-        return '';
+        return pgputil.error.GIT_BITLENGTH_INVALID_KEY;
     },
 
     //check if a keyobject (from readArmored) is a private key or not.
@@ -216,6 +241,24 @@ var pgputil = {
 
         openpgp.encrypt(options).then(callback_signed);
     },
+    
+    
+    //combines format validation and signature verification into a single function.
+    verify_text: function (cleartext, pubobj, callback_verified, callback_failure) {
+        try{
+            var formaterror = this.verify_text_format(cleartext);
+            console.log("formaterror: "+formaterror);
+            if(formaterror === pgputil.error.NONE){
+                return this.verify_text_signature(cleartext,pubobj,callback_verified);
+            }else{
+                callback_verified(false, null, formaterror);
+            }
+        }catch(exception){
+            callback_failure(exception,cleartext);
+        }
+        return null;
+    },
+    
 
     //checks a clearsigned armor message against a pubkeyobj and calls a callback with the result
     //	validity = true (message was verified against the key)
@@ -224,40 +267,39 @@ var pgputil = {
     //		error=1: No signatures found
     //		error=2: Signature key does not match given pubkey
     //		error=3: verification result object was not valid.
+    //		error=4: bad signature for this message
     //the calback will receive the validity, a verification result object, and the error code
     // the verification object holds a list of signatures in verobj.signatures, of which you can check the validity with verobj.signatures[i].valid
-    verify_text: function (cleartext, pubobj, callback_verified) {
-        var formaterror = this.verify_text_format(cleartext);
+    verify_text_signature: function (cleartext, pubobj, callback_verified) {
         var options = {
             message: openpgp.cleartext.readArmored(cleartext), // parse armored message
             publicKeys: pubobj.keys   // for verification
         };//NOTE: only exceptions from Read will be caught from this function
         var result = openpgp.verify(options).then(function (verified) {
             var validity = null;
-            var error = 0;
+            var error = pgputil.error.NONE;
             if (typeof verified !== 'object') {
-                error = 3;
+                error = pgputil.error.VERIFY_RESULT_INVALID;
             } else if (verified.signatures.length === 0) {//verification can fail on null without any signature entries.
-                error = 1;
+                error = pgputil.error.VERIFY_NO_SIGNATURE;
             } else {
                 validity = verified.signatures[0].valid;
-                if (validity === null)
-                    error = 2;
+                if (validity === null)//verification won't produce a validty for nonmatching keys, so we verified a message with a different keyid
+                    error = pgputil.error.VERIFY_VALIDITY_NULL;
+            }
+            if(validity===false && error===pgputil.error.NONE){
+                error=pgputil.error.VERIFY_RESULT_BAD_SIGNATURE;//validity returned false above, but no errors - so the signature was formatted correctly, but doesn't match the message.
             }
 
-
-            if (formaterror !== 0) {
+            if (validity === null){
                 validity = false;
-                error = formaterror;
             }
-
-            if (validity === null)
-                validity = false;
             callback_verified(validity, verified, error);
             return validity;
         });
         return result;
     },
+    
 
     //checks a clearsigned armor message for discrepancies in formatting that are ignored by OpenPGP.js
     //refer to this infographic for how this function validates messages https://i.imgur.com/AvultlA.png
@@ -277,10 +319,10 @@ var pgputil = {
             } else if (context === "msg-headers" && line !== "") {//if we're in the preamble (hashes etc) and encounter a non-blank line, then it MUST be a valid header
                 var header_split = {name: "", value: ""};//create object to hold results
                 if (!this.verify_text_header(line, header_split))
-                    return 1001;//verify and split header into object
+                    return pgputil.error.VERIFY_FORMAT_BAD_MESSAGE_HEADER;//verify and split header into object
                 if (header_split.name === "Hash") {
                     if (header_split.value !== hash && hash !== "")
-                        return 1004;//if the current hash is known and this header doesn't match it - there's a conflict.
+                        return pgputil.error.VERIFY_FORMAT_HASH_MISMATCH;//if the current hash is known and this header doesn't match it - there's a conflict.
                     else
                         hash = header_split.value;//if the hash header is not known (or inconsequentially matches the current), set the current hash to this header value
                 }
@@ -290,7 +332,7 @@ var pgputil = {
                 context = "sig-headers";
             } else if (context === "sig-headers" && line !== "") {//if we're in the signature header section and encounter a non-blank line then it MUST be a valid header
                 if (!this.verify_text_header(line))
-                    return 1002;
+                    return pgputil.error.VERIFY_FORMAT_BAD_SIG_HEADER;
             } else if (context === "sig-headers" && line === "") {//if we are in the signature header section and encounter a blank line, now we're in the signature
                 context = "signature";
             } else if (context === "signature" && line === "-----END PGP SIGNATURE-----") {
@@ -298,9 +340,10 @@ var pgputil = {
             }
             //console.log("`"+line+"` "+line.length+" "+(line==="")+"  ["+precontext+" -> "+context+"]");
         }
-        if (context !== "outside-after")
-            return 1003;
-        return 0;
+        if (context !== "outside-after"){
+            return pgputil.error.VERIFY_FORMAT_INVALID;
+        }
+        return pgputil.error.NONE;
     },
     verify_text_header: function (header, dest_object) {
         if (typeof dest_object === "undefined")
