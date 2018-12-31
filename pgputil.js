@@ -19,6 +19,7 @@ var pgputil = {
         VERIFY_VALIDITY_NULL:2, VERIFY_INCORRECT_KEY:2,
         VERIFY_RESULT_INVALID:3,
         VERIFY_RESULT_BAD_SIGNATURE:4,
+        VERIFY_EXCEPTION:5,
         VERIFY_FORMAT_BAD_MESSAGE_HEADER:1001,
         VERIFY_FORMAT_BAD_SIG_HEADER:1002,
         VERIFY_FORMAT_INVALID:1003,//generic error for incomplete messages
@@ -29,6 +30,7 @@ var pgputil = {
             2: "Incorrect signature keyid (signed by someone else)",
             3: "Error processing message",
             4: "Bad signature (does not match message)",
+            5: "Exception",
             1001: "Invalid message header",
             1002: "Invalid signature header",
             1003: "Invalid format",
@@ -252,9 +254,11 @@ var pgputil = {
                 return this.verify_text_signature(cleartext,pubobj,callback_verified);
             }else{
                 callback_verified(false, null, formaterror);
+                return Promise.resolve( {validity:false,verified:null, error:formaterror} );
             }
         }catch(exception){
             callback_failure(exception,cleartext);
+            return Promise.resolve( {validity:false, verified:null, error:pgputil.error.VERIFY_EXCEPTION, exception:exception} );
         }
         return null;
     },
@@ -295,7 +299,7 @@ var pgputil = {
                 validity = false;
             }
             callback_verified(validity, verified, error);
-            return validity;
+            return {validity:validity,verified:verified, error:error};
         });
         return result;
     },
