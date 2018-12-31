@@ -356,7 +356,7 @@ var pgputil = {
         //console.log(parts);
         if (parts.length < 2)
             return false;
-        if (parts[0] !== "Hash" && parts[0] !== "Version" && parts !== "Comment")
+        if (parts[0] !== "Hash" && parts[0] !== "Version" && parts[0] !== "Comment")
             return false;
         if (dest_object !== null) {
             dest_object.name = parts[0];
