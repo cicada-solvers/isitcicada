@@ -5,7 +5,6 @@ Hash: SHA256
 test
 -----BEGIN PGP SIGNATURE-----
 Version: OpenPGP.js v2.6.1
-Comment: https://openpgpjs.org
 
 wsFcBAEBCAAQBQJa8ArnCRB4YHEIeM/6XAAAdBEP/iNXvUArdS2CRnFGXY93
 PonVl64/ccvPIv84br6dDqmS/HNVbiYceb2Y5ECN0d2Veya7F5TuX94e49hy
