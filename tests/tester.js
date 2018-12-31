@@ -1,5 +1,5 @@
 function isPromise(value) {
-    return value && Object.prototype.toString.call(value) === "[object Promise]";
+    return (value && Object.prototype.toString.call(value) === "[object Promise]") || (typeof value.then === "function");
 }
 
 var tester = {
@@ -62,19 +62,18 @@ var tester = {
         var tester_instance = this;
         var test_output = test_function(this.cases[i].input);
 
-        console.log("test_case");
-        console.log(test_output);
-        console.log("isPromise: "+isPromise(test_output));
-        if (isPromise(test_output) || typeof test_output==="object") {//if we get a promise (async function still running), wait for the result to complete the test-case
-            console.log(test_output);
+        console.log("test_case output: " + JSON.stringify(test_output)+", isPromise:"+isPromise(test_output));
+        if (isPromise(test_output)) {//if we get a promise (async function still running), wait for the result to complete the test-case // || typeof test_output==="object"
             test_output.then(function (final_output) {
                 tester_instance.test_case(i, function () {
-                    console.log(final_output);
+                     console.log("         test_case output resolved: " + JSON.stringify(final_output));
                     return final_output;
                 }, test_callback);
             });
             return;
         }
+        
+        if(typeof test_output==="object") test_output=JSON.stringify(test_output);
 
         this.cases[i].actual = test_output;
         this.cases[i].result = (this.cases[i].expectation === this.cases[i].actual);

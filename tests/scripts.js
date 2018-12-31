@@ -9,15 +9,27 @@ function addResult_callback(testcase){
 }
 
 
+
+
+
 function testPgpInput(input_str,resolve,reject){
 	$("#input_text").val(input_str);
 	window.input_check=true;
 	window.input_dirty=true;
-	var retval = input_verify();
-        console.log("retval: ");
-        console.log(retval);
-	resolve(retval);
-	return retval;
+        var retval=input_verify();
+        console.log("   testPgpInput got: "+JSON.stringify(retval));
+        var result = retval.then(function( value ){
+            if(typeof value.verified!=="undefined" && value.verified!==null ) value.verified={};
+            if(typeof value.exception!=="undefined"){
+                value.exception=value.exception.message;
+            }
+            value = JSON.stringify(value).replace(/\x22/g, '');
+            console.log("     testPgpInput resolved: "+value);
+            resolve(value);
+        });
+        console.log("   testPgpInput returned: "+JSON.stringify(result));
+        //resolve(result);
+        //return result;
 }
 
 function testPgpInput_delayed(input_str){
