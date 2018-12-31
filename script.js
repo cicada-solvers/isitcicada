@@ -90,6 +90,7 @@ function input_verified(validity, verified, error) {
             case pgputil.error.VERIFY_FORMAT_BAD_MESSAGE_HEADER:
             case pgputil.error.VERIFY_FORMAT_BAD_SIG_HEADER:
             case pgputil.error.VERIFY_FORMAT_HASH_MISMATCH:
+            case pgputil.error.VERIFY_FORMAT_HASH_IN_SIG:
             case pgputil.error.VERIFY_FORMAT_INVALID:
                 color="orange";
         }

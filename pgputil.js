@@ -24,6 +24,7 @@ var pgputil = {
         VERIFY_FORMAT_BAD_SIG_HEADER:1002,
         VERIFY_FORMAT_INVALID:1003,//generic error for incomplete messages
         VERIFY_FORMAT_HASH_MISMATCH:1004,
+        VERIFY_FORMAT_HASH_IN_SIG:1005,
         messages:{
             0: "Success",
             1: "No valid signature present",
@@ -34,7 +35,8 @@ var pgputil = {
             1001: "Invalid message header",
             1002: "Invalid signature header",
             1003: "Invalid format",
-            1004: "Conflicting Hash header values"
+            1004: "Conflicting Hash header values",
+            1005: "Hash header is not allowed in signature"
         }
     },
     
@@ -335,8 +337,11 @@ var pgputil = {
             } else if (context === "content" && line === "-----BEGIN PGP SIGNATURE-----") {
                 context = "sig-headers";
             } else if (context === "sig-headers" && line !== "") {//if we're in the signature header section and encounter a non-blank line then it MUST be a valid header
-                if (!this.verify_text_header(line))
+                var header_split = {name: "", value: ""};//create object to hold results
+                if (!this.verify_text_header(line,header_split))
                     return pgputil.error.VERIFY_FORMAT_BAD_SIG_HEADER;
+                if(header_split.name==="Hash")
+                    return pgputil.error.VERIFY_FORMAT_HASH_IN_SIG;
             } else if (context === "sig-headers" && line === "") {//if we are in the signature header section and encounter a blank line, now we're in the signature
                 context = "signature";
             } else if (context === "signature" && line === "-----END PGP SIGNATURE-----") {

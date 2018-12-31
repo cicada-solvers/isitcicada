@@ -19,5 +19,6 @@
 	{"id":17,"name":"PGP Message - Valid message","expectation":"{validity:true,verified:{},error:0}"},
 	{"id":18,"name":"PGP Message - Valid message","expectation":"{validity:true,verified:{},error:0}"},
 	{"id":19,"name":"PGP Message - Valid message SHA1","expectation":"{validity:true,verified:{},error:0}"},
-	{"id":20,"name":"PGP Message - Valid message with comment header","expectation":"{validity:true,verified:{},error:0}"}
+	{"id":20,"name":"PGP Message - Valid message with comment header","expectation":"{validity:true,verified:{},error:0}"},
+	{"id":21,"name":"PGP Message - Hash header in signature area","expectation":"{validity:false,verified:null,error:1005}"}
 ]
