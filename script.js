@@ -98,15 +98,16 @@ function input_verified(validity, verified, error) {
 }
 function input_failed(err, text) {
     console.log(err);
-    if (err.message === "Unknown ASCII armor type") {
+    var message = err.message;
+    if (message === "Unknown ASCII armor type") {
         if (text.length === 0)
-            err.message = "&nbsp;";
+            message = "&nbsp;";
         else
-            err.message = 'Malformed ASCII armor message';
+            message = 'Malformed ASCII armor message';
     }
     if (text.length !== 0)
-        err.message = '<span style="color:orange">NO - ' + err.message + '</span>';
-    $('#result_text').html(err.message);
+        message = '<span style="color:orange">NO - ' + err.message + '</span>';
+    $('#result_text').html(message);
 }
 
 function load_key() {
