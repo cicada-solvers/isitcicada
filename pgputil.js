@@ -12,6 +12,16 @@ if (typeof openpgp === "undefined") {
 var pgputil = {
     //keyring held in memory, keys are stored as armor text, indexed by fingerprint
     
+    warning:{//things to inform the user about that don't really impact verification.
+        VERIFY_FORMAT_DATA_OUTSIDE_MESSAGE: 2001,
+        VERIFY_FORMAT_EMPTY_MESSAGE: 2002,
+        VERIFY_FORMAT_COMMENTS: 2003,
+        messages:{
+            2001: "Text outside of the message body cannot be verified",
+            2002: "Whitespace inside of empty messages cannot be verified to be authentic",
+            2003: "Comment headers cannot be verified to be authentic"
+        }
+    },
     error:{
         GIT_BITLENGTH_INVALID_KEY: "",
         NONE:0,
