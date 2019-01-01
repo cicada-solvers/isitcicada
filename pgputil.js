@@ -8,35 +8,39 @@ if (typeof openpgp === "undefined") {
     var openpgp = {};//suppress warnings in editor - doesn't change anything.
     console.error("PGPUtil loaded before OpenPGP");
 }
+if (typeof PgpParser === "undefined") {
+    var PgpParser = {};//suppress warnings in editor - doesn't change anything.
+    console.error("PGPUtil loaded before PgpParser");
+}
 
 var pgputil = {
     //keyring held in memory, keys are stored as armor text, indexed by fingerprint
-    
-    warning:{//things to inform the user about that don't really impact verification.
+
+    warning: {//things to inform the user about that don't really impact verification.
         VERIFY_FORMAT_DATA_OUTSIDE_MESSAGE: 2001,
         VERIFY_FORMAT_EMPTY_MESSAGE: 2002,
         VERIFY_FORMAT_COMMENTS: 2003,
-        messages:{
+        messages: {
             2001: "Text outside of the message body cannot be verified",
             2002: "Whitespace inside of empty messages cannot be verified to be authentic",
             2003: "Comment headers cannot be verified to be authentic"
         }
     },
-    error:{
+    error: {
         GIT_BITLENGTH_INVALID_KEY: "",
-        NONE:0,
-        VERIFY_NO_SIGNATURE:1,
-        VERIFY_VALIDITY_NULL:2, VERIFY_INCORRECT_KEY:2,
-        VERIFY_RESULT_INVALID:3,
-        VERIFY_RESULT_BAD_SIGNATURE:4,
-        VERIFY_EXCEPTION:5,
-        VERIFY_FORMAT_BAD_MESSAGE_HEADER:1001,
-        VERIFY_FORMAT_BAD_SIG_HEADER:1002,
-        VERIFY_FORMAT_INVALID:1003,//generic error for incomplete messages
-        VERIFY_FORMAT_HASH_MISMATCH:1004,
-        VERIFY_FORMAT_HASH_IN_SIG:1005,
-        VERIFY_FORMAT_EMPTY:1006,
-        messages:{
+        NONE: 0,
+        VERIFY_NO_SIGNATURE: 1,
+        VERIFY_VALIDITY_NULL: 2, VERIFY_INCORRECT_KEY: 2,
+        VERIFY_RESULT_INVALID: 3,
+        VERIFY_RESULT_BAD_SIGNATURE: 4,
+        VERIFY_EXCEPTION: 5,
+        VERIFY_FORMAT_BAD_MESSAGE_HEADER: 1001,
+        VERIFY_FORMAT_BAD_SIG_HEADER: 1002,
+        VERIFY_FORMAT_INVALID: 1003, //generic error for incomplete messages
+        VERIFY_FORMAT_HASH_MISMATCH: 1004,
+        VERIFY_FORMAT_HASH_IN_SIG: 1005,
+        VERIFY_FORMAT_EMPTY: 1006,
+        messages: {
             0: "Success",
             1: "No valid signature present",
             2: "Incorrect signature keyid (signed by someone else)",
@@ -50,7 +54,7 @@ var pgputil = {
             1005: "Hash header is not allowed in signature"
         }
     },
-    
+
     pubkeys: {},
     privkeys: {},
     //default privkey index/fingerprint
@@ -256,26 +260,29 @@ var pgputil = {
 
         openpgp.encrypt(options).then(callback_signed);
     },
-    
-    
+
     //combines format validation and signature verification into a single function.
     verify_text: function (cleartext, pubobj, callback_verified, callback_failure) {
-        try{
-            var formaterror = this.verify_text_format(cleartext);
-            console.log("formaterror: "+formaterror);
-            if(formaterror === pgputil.error.NONE){
-                return this.verify_text_signature(cleartext,pubobj,callback_verified);
-            }else{
+        try {
+            var formatresult = this.verify_text_format(cleartext);
+            var formaterror = formatresult.error;
+            console.log("formaterror: " + formaterror);
+            if (formaterror === pgputil.error.NONE) {
+                return this.verify_text_signature(cleartext, pubobj).then(function (result) {
+                    result.warnings = formatresult.warnings;
+                    callback_verified(result.validity,result.verified,result.error,formatresult.warnings);
+                    return result;
+                });
+            } else {
                 callback_verified(false, null, formaterror);
-                return Promise.resolve( {validity:false,verified:null, error:formaterror} );
+                return Promise.resolve({validity: false, verified: null, error: formaterror, warnings: formatresult.warnings});
             }
-        }catch(exception){
-            callback_failure(exception,cleartext);
-            return Promise.resolve( {validity:false, verified:null, error:pgputil.error.VERIFY_EXCEPTION, exception:exception} );
+        } catch (exception) {
+            callback_failure(exception, cleartext);
+            return Promise.resolve({validity: false, verified: null, error: pgputil.error.VERIFY_EXCEPTION, exception: exception, warnings: formatresult.warnings});
         }
         return null;
     },
-    
 
     //checks a clearsigned armor message against a pubkeyobj and calls a callback with the result
     //	validity = true (message was verified against the key)
@@ -304,67 +311,71 @@ var pgputil = {
                 if (validity === null)//verification won't produce a validty for nonmatching keys, so we verified a message with a different keyid
                     error = pgputil.error.VERIFY_VALIDITY_NULL;
             }
-            if(validity===false && error===pgputil.error.NONE){
-                error=pgputil.error.VERIFY_RESULT_BAD_SIGNATURE;//validity returned false above, but no errors - so the signature was formatted correctly, but doesn't match the message.
+            if (validity === false && error === pgputil.error.NONE) {
+                error = pgputil.error.VERIFY_RESULT_BAD_SIGNATURE;//validity returned false above, but no errors - so the signature was formatted correctly, but doesn't match the message.
             }
 
-            if (validity === null){
+            if (validity === null) {
                 validity = false;
             }
-            callback_verified(validity, verified, error);
-            return {validity:validity,verified:verified, error:error};
+            if(typeof callback_verified!=="undefined") callback_verified(validity, verified, error);
+            return {validity: validity, verified: verified, error: error};
         });
         return result;
     },
-    
 
     //checks a clearsigned armor message for discrepancies in formatting that are ignored by OpenPGP.js
     //refer to this infographic for how this function validates messages https://i.imgur.com/AvultlA.png
     verify_text_format: function (cleartext) {
-        if(cleartext.length===0) return pgputil.error.VERIFY_FORMAT_EMPTY;
-        cleartext = cleartext.replace(/\/r/g, '');//remove Carriage Returns so that we can split the message by linefeeds
-        var lines = cleartext.split("\n");
-        var context = "outside-before";
-        var hash = "";//current hash for the message - can be unset but cannot conflict between headers.
-        for (var i = 0; i < lines.length; i++) {
-            var precontext = context;//unused but can be used in future processing to determine the previous context (stage/section) of data being processed.
-            var line = lines[i];
-            line = line.replace(/\s+$/g, '');//right-trim whitespace from end of line
-
-            //state-based parsing in normal message order (yes this looks bad, feel free to refactor this)
-            if (context === "outside-before" && line === "-----BEGIN PGP SIGNED MESSAGE-----") {//if we're outside and encounter a BEGIN, then we're in the preamble (containing headers)
-                context = "msg-headers";
-            } else if (context === "msg-headers" && line !== "") {//if we're in the preamble (hashes etc) and encounter a non-blank line, then it MUST be a valid header
-                var header_split = {name: "", value: ""};//create object to hold results
-                if (!this.verify_text_header(line, header_split))
-                    return pgputil.error.VERIFY_FORMAT_BAD_MESSAGE_HEADER;//verify and split header into object
-                if (header_split.name === "Hash") {
-                    if (header_split.value !== hash && hash !== "")
-                        return pgputil.error.VERIFY_FORMAT_HASH_MISMATCH;//if the current hash is known and this header doesn't match it - there's a conflict.
-                    else
-                        hash = header_split.value;//if the hash header is not known (or inconsequentially matches the current), set the current hash to this header value
+        if (cleartext.length === 0)
+            return {error: pgputil.error.VERIFY_FORMAT_EMPTY, warnings: []};
+        var parser = new PgpParser(
+                function line_complete(parser) {
+                    if (parser.current.section === "msg-headers" || parser.current.section === "sig-headers") {
+                        var header = {name: "", value: ""};
+                        var header_result = pgputil.verify_text_header(parser.current.line, header);
+                        //console.log("LINE in " + parser.current.section + ": " + parser.current.line);
+                        //console.log("result: " + header_result);
+                        //console.log("split: " + header);
+                        if (!header_result) {
+                            if (parser.current.section === "msg-headers")
+                                parser.fail(pgputil.error.VERIFY_FORMAT_BAD_MESSAGE_HEADER);
+                            else
+                                parser.fail(pgputil.error.VERIFY_FORMAT_BAD_SIG_HEADER);
+                        }
+                        if (parser.current.section === "sig-headers" && header.name === "Hash")
+                            parser.fail(pgputil.error.VERIFY_FORMAT_HASH_IN_SIG);
+                        if (header.name === "Comment") {
+                            parser.warn(pgputil.warning.VERIFY_FORMAT_COMMENTS);
+                        }
+                        if (header.name === "Hash") {
+                            //console.log("hash dup check: previous: " + parser.previous.hash + ", new: " + header.value);
+                            if (parser.final.hash !== null && parser.final.hash !== header.value)
+                                parser.fail(pgputil.error.VERIFY_FORMAT_HASH_MISMATCH);
+                            parser.final.hash = header.value;
+                        }
+                    }
+                },
+                function section_complete(parser) {
+                    console.log("section complete " + parser.current.section + ": " + parser.current.section_data);
+                    if (parser.current.section === "outside-before" || parser.current.section === "outside-after") {
+                        var stripped_data = parser.current.section_data.replace(/\s+/g, '');
+                        if (stripped_data.length > 0)
+                            parser.warn(pgputil.warning.VERIFY_FORMAT_DATA_OUTSIDE_MESSAGE);
+                    } else if (parser.current.section === "content") {
+                        var stripped_data = parser.current.section_data.replace(/\s+/g, '');
+                        console.log("stripped-data: " + stripped_data);
+                        if (stripped_data.length === 0)
+                            parser.warn(pgputil.warning.VERIFY_FORMAT_EMPTY_MESSAGE);
+                    }
                 }
-            } else if (context === "msg-headers" && line === "") {//if we're in the preamble (hashes etc) and encounter a blank line, then we're not in the message
-                context = "content";
-            } else if (context === "content" && line === "-----BEGIN PGP SIGNATURE-----") {
-                context = "sig-headers";
-            } else if (context === "sig-headers" && line !== "") {//if we're in the signature header section and encounter a non-blank line then it MUST be a valid header
-                var header_split = {name: "", value: ""};//create object to hold results
-                if (!this.verify_text_header(line,header_split))
-                    return pgputil.error.VERIFY_FORMAT_BAD_SIG_HEADER;
-                if(header_split.name==="Hash")
-                    return pgputil.error.VERIFY_FORMAT_HASH_IN_SIG;
-            } else if (context === "sig-headers" && line === "") {//if we are in the signature header section and encounter a blank line, now we're in the signature
-                context = "signature";
-            } else if (context === "signature" && line === "-----END PGP SIGNATURE-----") {
-                context = "outside-after";
-            }
-            //console.log("`"+line+"` "+line.length+" "+(line==="")+"  ["+precontext+" -> "+context+"]");
-        }
-        if (context !== "outside-after"){
-            return pgputil.error.VERIFY_FORMAT_INVALID;
-        }
-        return pgputil.error.NONE;
+        );
+        parser.final.hash = null;
+        parser.parse(cleartext);
+        //console.log(parser.final);
+        if (parser.final.section !== "outside-after" && parser.final.error === pgputil.error.NONE)
+            parser.final.error = pgputil.error.VERIFY_FORMAT_INVALID;
+        return {error: parser.final.error, warnings: parser.final.warnings};
     },
     verify_text_header: function (header, dest_object) {
         if (typeof dest_object === "undefined")

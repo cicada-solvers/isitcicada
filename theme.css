@@ -32,6 +32,11 @@ textarea{
 	color:#ffffff;
 }
 
+#warning_text{
+    color:gray;
+    text-align:left;
+    font-size:10pt;
+}
 
 #loadcover{
 	display:block;
@@ -78,7 +83,7 @@ ul.faq p{
 
 .flex-item:nth-child(1) {
     order: 0;
-    flex: 0 0 82px;
+    flex: 0 0 104px;
     align-self: auto;
 }
 

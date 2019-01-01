@@ -7,13 +7,15 @@
 		<link rel="stylesheet" type="text/css" href="theme.css">
 		<script src="jquery-3.2.1.min.js"></script>
 		<script src="openpgp.min.js"></script>
-		<script src="pgputil.js?v=6"></script>
-		<script src="script.js?v=6"></script>
+		<script src="lineparser.js"></script>
+		<script src="pgpparser.js"></script>
+		<script src="pgputil.js?v=7"></script>
+		<script src="script.js?v=7"></script>
 	</head>
 	<body class="flex-container">
 		<div class="flex-item head-flex-container">
 			<div class="head-flex-item"></div>
-			<div class="head-flex-item"><center><h1>Is It Cicada?</h1><h2 id="result_text">&nbsp;</h2></center></div>
+                        <div class="head-flex-item"><center><h1>Is It Cicada?</h1><h2 id="result_text">&nbsp;</h2></center><h4 id="warning_text">&nbsp;<br>&nbsp;<br>&nbsp;</h4></div>
 			<div class="head-flex-item textright"><span class="links">main &bull; <a href="about.html">about</a></span></div>
 		</div>
 		<textarea id="input_text" class="flex-item" placeholder="Paste PGP-signed message here"></textarea>

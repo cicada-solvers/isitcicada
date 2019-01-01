@@ -74,9 +74,19 @@ function input_verify() {
     }*/
 }
 
-function input_verified(validity, verified, error) {
+function input_verified(validity, verified, error, warnings) {
     if (validity === true) {
         $('#result_text').html('<span style="color:green">YES - Good Signature</span>');
+
+        var warningmessage="";
+        for(var i=0;i<warnings.length;i++){
+            var warning=warnings[i];
+            if(warningmessage.length>0) warningmessage+="<br>";
+            warningmessage+="Warning: "+pgputil.warning.messages[warning];
+        }
+        if(warningmessage.length===0) warningmessage="&nbsp;";
+        $('#warning_text').html(warningmessage);
+        
     } else {//could decode but not verify - usually because a different (incorrect) key signed the message. we can check if this is the case.
         var color="red";
         var message = pgputil.error.messages[error];
