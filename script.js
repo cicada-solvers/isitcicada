@@ -63,15 +63,9 @@ function input_verify() {
     var pubkeyobj = pgputil.get_pub('6d854cd7933322a601c3286d181f01e57a35090f');
     var text = $("#input_text").val();
     $('#result_text').html('&nbsp;');
+    $('#warning_text').html('&nbsp;');
     
     return pgputil.verify_text(text,pubkeyobj,input_verified,input_failed);
-    /*
-    try {
-        return pgputil.verify_text(text, pubkeyobj, input_verified);
-    } catch (err) {
-        input_failed(err, text);
-        return 'error';
-    }*/
 }
 
 function input_verified(validity, verified, error, warnings) {
