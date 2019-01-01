@@ -51,9 +51,13 @@ Lineparser.prototype={
         CONTINUE:undefined,
         STOP:1
     },
+    
+    //stop parsing from a callback function
     stop:function(){
         throw "lineparser-stop";
     },
+    
+    //reset the state information of the parser (current, previous, final)
     reset:function(){
         this.previous={},
         this.current={
@@ -66,6 +70,8 @@ Lineparser.prototype={
             exception:null
         };
     },
+    
+    //parser a multiline message by previously given section markers
     parse:function(text){
         text = text.replace(/\/r/g, '');
         var lines = text.split("\n");
@@ -91,14 +97,22 @@ Lineparser.prototype={
         
         this.parse_end();
     },
+    
+    //perform necessary setup before parsing starts.
     parse_begin:function(){
     },
+    
+    //perform necessary tasks before parsing ends.
     parse_end:function(){
         Object.assign( this.final ,this.current);
     },
+    
+    //parse / run callbacks on a single line of input (does not include section markers)
     parse_line:function(line){
         this.triggerCallback(this.line_callback);
     },
+    
+    //using a line, check if it is a section marker and change the section if necessary.
     change_section_by_marker:function(line){
         //console.log("Sections: ");
         //console.log(this.sections);
@@ -114,17 +128,21 @@ Lineparser.prototype={
         }
         return false;
     },
+    
+    //changes the section / state information internally.
     change_section_nocallback:function(id,name,marker){
         this.previous=Object.assign({}, this.current);
         this.current.section_id=id;
         this.current.section=name;
         this.current.section_data="";
     },
+    //changes section/state information after running the completion callback for the previous section.
     change_section:function(id,name,marker){
         console.log("Section: "+this.current.section +" -> "+name);
         this.triggerCallback(this.section_complete_callback);
         this.change_section_nocallback(id,name,marker);
     },
+    //triggers a specific callback and handles the return value
     triggerCallback:function(callback){
         var result = callback(this);
         if(result===this.callback_result.STOP) this.stop();

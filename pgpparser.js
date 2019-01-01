@@ -21,6 +21,9 @@ if (typeof Lineparser === "undefined") {
     console.error("pgpparser code loaded before Lineparser");
 }
 
+//a stateful text-line parser for pgp cleartext messages.
+//the line callback is called when each line in a section of the message is processed
+//the section-complete callback is called when all data for a section has been collected (the section was ended or moved onto the next section)
 function PgpParser(line_callback,section_complete_callback){
     this.reset();
     this.line_callback=line_callback;
@@ -31,34 +34,21 @@ function PgpParser(line_callback,section_complete_callback){
 
 //this is ugly and I hate prototypal inheritance + backporting
 PgpParser.prototype = new Lineparser([
-    ["msg-headers","-----BEGIN PGP SIGNED MESSAGE-----"],
+    ["msg-headers","-----BEGIN PGP SIGNED MESSAGE-----"],//define the starting conditions for each section
     ["content",""],
     ["sig-headers","-----BEGIN PGP SIGNATURE-----"],
     ["signature",""],
     ["outside-after","-----END PGP SIGNATURE-----"]
-],"outside-before");
+],"outside-before");//define the initial section name
 
+//record a fatal error from a callback function (stored in parserobject.final.error)
 PgpParser.prototype.fail=function(error){
     this.final.error=error;
     this.stop();
 };
+
+//record a warning from a callback function (stored in parserobject.final.warnings)
 PgpParser.prototype.warn=function(warning){
     if(this.final.warnings.indexOf(warning)===-1)
         this.final.warnings.push(warning);
 };
-
-var test_parser = new PgpParser();
-var test_document=null;
-
-
-        var filename = "./tests/cases/23.txt";
-        $.ajax({
-            dataType: "text",
-            url: filename,
-            data: null,
-            success: function (data) {
-                //console.log(data)
-                //console.log(tester_instance.cases[i]);
-                test_document= data;
-            }
-        });
