@@ -83,6 +83,9 @@ function input_verified(validity, verified, error) {
         if(typeof message === "undefined") message="Unknown error "+error;
         
         switch (error) {
+            case pgputil.error.VERIFY_FORMAT_EMPTY:
+                $('#result_text').html('&nbsp');
+                return;
             case pgputil.error.NONE:
                 message="Internal error (report this)";
             case pgputil.error.VERIFY_NO_SIGNATURE:
@@ -95,6 +98,7 @@ function input_verified(validity, verified, error) {
                 color="orange";
         }
         $('#result_text').html('<span style="color:'+color+'">NO - '+message+'</span>');
+        
     }
 }
 function input_failed(err, text) {

@@ -35,6 +35,7 @@ var pgputil = {
         VERIFY_FORMAT_INVALID:1003,//generic error for incomplete messages
         VERIFY_FORMAT_HASH_MISMATCH:1004,
         VERIFY_FORMAT_HASH_IN_SIG:1005,
+        VERIFY_FORMAT_EMPTY:1006,
         messages:{
             0: "Success",
             1: "No valid signature present",
@@ -320,6 +321,7 @@ var pgputil = {
     //checks a clearsigned armor message for discrepancies in formatting that are ignored by OpenPGP.js
     //refer to this infographic for how this function validates messages https://i.imgur.com/AvultlA.png
     verify_text_format: function (cleartext) {
+        if(cleartext.length===0) return pgputil.error.VERIFY_FORMAT_EMPTY;
         cleartext = cleartext.replace(/\/r/g, '');//remove Carriage Returns so that we can split the message by linefeeds
         var lines = cleartext.split("\n");
         var context = "outside-before";
