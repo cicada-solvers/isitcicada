@@ -25,7 +25,7 @@ body{
 textarea{
 	resize: none;
 	background-color:#000000;
-	background-image: url('logo.jpg');
+	background-image: url('logo.png');
     background-repeat: no-repeat;
     background-attachment: fixed;
     background-position: center;
