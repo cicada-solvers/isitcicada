@@ -2,6 +2,7 @@
 PGP web-app that verifies signed ascii armor messages automatically.
 
 Live developer demo: https://cicada-solvers.github.io/isitcicada
+
 Production site: https://isitcicada.challenge.pt/
 
 ### Note
