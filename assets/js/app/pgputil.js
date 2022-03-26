@@ -264,7 +264,7 @@ var pgputil = {
     //combines format validation and signature verification into a single function.
     verify_text: function (cleartext, pubobj, callback_verified, callback_failure) {
         try {
-            var formatType = PgpParsing.guessParser(cleartext);
+            var formatType = PgpParsing.guessMessageType(cleartext);
             var formatresult = this.verify_text_format(formatType,cleartext);
             var formaterror = formatresult.error;
             console.log("formaterror: " + formaterror);
