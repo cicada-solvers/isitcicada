@@ -27,7 +27,7 @@ var tester = {
         });
     },
     load_case_data: function (i, loaded_callback) {
-        var filename = "./cases/" + this.cases[i].id.toString() + ".txt";
+        var filename = "./assets/pgp/test-cases/" + this.cases[i].id.toString() + ".txt";
         var tester_instance = this;
         $.ajax({
             dataType: "text",

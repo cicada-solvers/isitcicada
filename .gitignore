@@ -1,3 +1,4 @@
 /nbproject/private/
-*.ttf
-*.otf
+/assets/fonts/*.ttf
+/assets/fonts/*.otf
+/assets/fonts/*.woff
