@@ -285,7 +285,7 @@ var pgputil = {
         return null;
     },
 
-    //checks a clearsigned armor message against a pubkeyobj and calls a callback with the result
+    //checks a signed or clearsigned armor message against a pubkeyobj and calls a callback with the result
     //	validity = true (message was verified against the key)
     //	validity = false (message could not be verified against the key)
     //		error=0: Unknown reason
@@ -339,8 +339,8 @@ var pgputil = {
         return result;
     },
 
-    //checks a clearsigned armor message for discrepancies in formatting that are ignored by OpenPGP.js
-    //refer to this infographic for how this function validates messages https://i.imgur.com/AvultlA.png
+    //checks a signed or clearsigned armor message for discrepancies in formatting that are ignored by OpenPGP.js
+    //This infographic shows how messages are validated in the case of an example Clearsigned message https://i.imgur.com/AvultlA.png - a similar process with less states is followed for signed messages.
     verify_text_format: function (formatType,cleartext) {
         if (cleartext.length === 0)
             return {error: pgputil.error.VERIFY_FORMAT_EMPTY, warnings: []};
