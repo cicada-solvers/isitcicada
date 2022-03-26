@@ -35,7 +35,7 @@ var PgpParsing = {
         CLEARSIGNED: 1,
         SIGNED: 2
     },
-    guessParser:function(cleartext){
+    guessMessageType:function(cleartext){
         //var i1 = cleartext.indexOf("-----BEGIN PGP SIGNED MESSAGE-----");
         var i2 = cleartext.indexOf("-----BEGIN PGP MESSAGE-----");
         if(i2!==-1) return PgpParsing.parsers.SIGNED;
