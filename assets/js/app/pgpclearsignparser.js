@@ -24,7 +24,7 @@ if (typeof Lineparser === "undefined") {
 //a stateful text-line parser for pgp cleartext messages.
 //the line callback is called when each line in a section of the message is processed
 //the section-complete callback is called when all data for a section has been collected (the section was ended or moved onto the next section)
-function PgpParser(line_callback,section_complete_callback){
+function PgpClearsignParser(line_callback,section_complete_callback){
     this.reset();
     this.line_callback=line_callback;
     this.section_complete_callback=section_complete_callback;
@@ -33,7 +33,7 @@ function PgpParser(line_callback,section_complete_callback){
 }
 
 //this is ugly and I hate prototypal inheritance + backporting
-PgpParser.prototype = new Lineparser([
+PgpClearsignParser.prototype = new Lineparser([
     ["msg-headers","-----BEGIN PGP SIGNED MESSAGE-----"],//define the starting conditions for each section
     ["content",""],
     ["sig-headers","-----BEGIN PGP SIGNATURE-----"],
@@ -42,13 +42,13 @@ PgpParser.prototype = new Lineparser([
 ],"outside-before");//define the initial section name
 
 //record a fatal error from a callback function (stored in parserobject.final.error)
-PgpParser.prototype.fail=function(error){
+PgpClearsignParser.prototype.fail=function(error){
     this.final.error=error;
     this.stop();
 };
 
 //record a warning from a callback function (stored in parserobject.final.warnings)
-PgpParser.prototype.warn=function(warning){
+PgpClearsignParser.prototype.warn=function(warning){
     if(this.final.warnings.indexOf(warning)===-1)
         this.final.warnings.push(warning);
 };
