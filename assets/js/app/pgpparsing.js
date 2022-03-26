@@ -30,16 +30,21 @@ if (typeof PgpSignParser === "undefined") {
     console.error("pgpparser code loaded before PgpSignParser");
 }
 
+if (typeof InitialLineMatcher === "undefined") {
+    var InitialLineMatcher = {};//suppress warnings in editor - doesn't change anything.
+    console.error("pgpparser code loaded before InitialLineMatcher");
+}
+
 var PgpParsing = {
     parsers:{
-        CLEARSIGNED: 1,
-        SIGNED: 2
+        CLEARSIGNED: 0,
+        SIGNED: 1
     },
     guessMessageType:function(cleartext){
-        //var i1 = cleartext.indexOf("-----BEGIN PGP SIGNED MESSAGE-----");
-        var i2 = cleartext.indexOf("-----BEGIN PGP MESSAGE-----");
-        if(i2!==-1) return PgpParsing.parsers.SIGNED;
-        return PgpParsing.parsers.CLEARSIGNED;
+        var matcher = new InitialLineMatcher(["-----BEGIN PGP SIGNED MESSAGE-----","-----BEGIN PGP MESSAGE-----"]);
+        matcher.parse(cleartext);
+        if(matcher.match!==null) return matcher.match;
+        return PgpParsing.parsers.CLEARSIGNED;//choose this as default if we cannot determine the type, though this should mean that it is rejected anyway.
     },
     
     createParser:function(type,line_callback,section_complete_callback){
