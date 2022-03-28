@@ -8,9 +8,9 @@ if (typeof openpgp === "undefined") {
     var openpgp = {};//suppress warnings in editor - doesn't change anything.
     console.error("PGPUtil loaded before OpenPGP");
 }
-if (typeof PgpParser === "undefined") {
-    var PgpParser = {};//suppress warnings in editor - doesn't change anything.
-    console.error("PGPUtil loaded before PgpParser");
+if (typeof PgpParsing === "undefined") {
+    var PgpParsing = {};//suppress warnings in editor - doesn't change anything.
+    console.error("PGPUtil loaded before PgpParsing");
 }
 
 var pgputil = {
@@ -264,11 +264,12 @@ var pgputil = {
     //combines format validation and signature verification into a single function.
     verify_text: function (cleartext, pubobj, callback_verified, callback_failure) {
         try {
-            var formatresult = this.verify_text_format(cleartext);
+            var formatType = PgpParsing.guessMessageType(cleartext);
+            var formatresult = this.verify_text_format(formatType,cleartext);
             var formaterror = formatresult.error;
             console.log("formaterror: " + formaterror);
             if (formaterror === pgputil.error.NONE) {
-                return this.verify_text_signature(cleartext, pubobj).then(function (result) {
+                return this.verify_text_signature(formatType,cleartext, pubobj).then(function (result) {
                     result.warnings = formatresult.warnings;
                     callback_verified(result.validity,result.verified,result.error,formatresult.warnings);
                     return result;
@@ -284,7 +285,7 @@ var pgputil = {
         return null;
     },
 
-    //checks a clearsigned armor message against a pubkeyobj and calls a callback with the result
+    //checks a signed or clearsigned armor message against a pubkeyobj and calls a callback with the result
     //	validity = true (message was verified against the key)
     //	validity = false (message could not be verified against the key)
     //		error=0: Unknown reason
@@ -294,11 +295,25 @@ var pgputil = {
     //		error=4: bad signature for this message
     //the calback will receive the validity, a verification result object, and the error code
     // the verification object holds a list of signatures in verobj.signatures, of which you can check the validity with verobj.signatures[i].valid
-    verify_text_signature: function (cleartext, pubobj, callback_verified) {
+    verify_text_signature: function (formatType,cleartext, pubobj, callback_verified) {
         var options = {
-            message: openpgp.cleartext.readArmored(cleartext), // parse armored message
+            //message: openpgp.message.readArmored(cleartext),
+            //message: openpgp.cleartext.readArmored(cleartext), // parse armored message
             publicKeys: pubobj.keys   // for verification
-        };//NOTE: only exceptions from Read will be caught from this function
+        };
+        
+        //NOTE: only exceptions from Read will be caught from this function
+        switch(formatType){
+            case PgpParsing.parsers.SIGNED:
+                options.message=openpgp.message.readArmored(cleartext);
+                break;
+            case PgpParsing.parsers.CLEARSIGNED:
+                options.message=openpgp.cleartext.readArmored(cleartext);
+                break;
+        }
+        
+        
+        
         var result = openpgp.verify(options).then(function (verified) {
             var validity = null;
             var error = pgputil.error.NONE;
@@ -324,12 +339,12 @@ var pgputil = {
         return result;
     },
 
-    //checks a clearsigned armor message for discrepancies in formatting that are ignored by OpenPGP.js
-    //refer to this infographic for how this function validates messages https://i.imgur.com/AvultlA.png
-    verify_text_format: function (cleartext) {
+    //checks a signed or clearsigned armor message for discrepancies in formatting that are ignored by OpenPGP.js
+    //This infographic shows how messages are validated in the case of an example Clearsigned message https://i.imgur.com/AvultlA.png - a similar process with less states is followed for signed messages.
+    verify_text_format: function (formatType,cleartext) {
         if (cleartext.length === 0)
             return {error: pgputil.error.VERIFY_FORMAT_EMPTY, warnings: []};
-        var parser = new PgpParser(
+        var parser = new PgpParsing.createParser(formatType,
                 function line_complete(parser) {
                     if (parser.current.section === "msg-headers" || parser.current.section === "sig-headers") {
                         var header = {name: "", value: ""};

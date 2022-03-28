@@ -1,7 +1,7 @@
 @font-face {
   font-family: 'FuturaPT';
-  src:  url('futura_pt.ttf') format('truetype'),
-        url('futura_ptb.otf') format('opentype');
+  src:  url('../fonts/futura_pt.ttf') format('truetype'),
+        url('../fonts/futura_ptb.otf') format('opentype');
 
 }
 
@@ -25,7 +25,7 @@ body{
 textarea{
 	resize: none;
 	background-color:#000000;
-	background-image: url('logo.png');
+	background-image: url('../images/logo.png');
     background-repeat: no-repeat;
     background-attachment: fixed;
     background-position: center;

@@ -121,7 +121,7 @@ function input_failed(err, text) {
 
 function load_key() {
     $.ajax({
-        url: "cicada_3301_key.txt",
+        url: "assets/pgp/cicada_3301_key.txt",
         data: '',
         dataType: 'text',
         success: function (response) {

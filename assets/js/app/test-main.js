@@ -43,7 +43,7 @@ function testPgpInput_delayed(input_str){
 }
 
 $(function(){
-	tester.load_cases('pgp_cases.json',function(){
+	tester.load_cases('assets/json/test-cases.json',function(){
 		$('#status').text('Running test-cases...');
 		tester.test_cases(testPgpInput_delayed, addResult_callback,function(){
 			$('#status').text('Tests Ran.');

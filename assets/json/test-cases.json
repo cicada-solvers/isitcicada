@@ -24,6 +24,7 @@
 	{"id":22,"name":"PGP Message - Empty File","expectation":"{validity:false,verified:null,error:1006,warnings:[]}"},
 	{"id":23,"name":"PGP Message - Valid message with before and after text","expectation":"{validity:true,verified:{},error:0,warnings:[2001,2003]}"},
         {"id":24,"name":"PGP Message - A 'compressed' message made with --sign instead of --clearsign","expectation":"{validity:true,verified:{},error:0,warnings:[]}"},
+	{"id":27,"name":"PGP Message - Valid clearsigned message with embedded non-clearsigned message","expectation":"{validity:true,verified:{},error:0,warnings:[]}"},
 	{"id":25,"name":"PGP Message - Valid message with MessageID header","expectation":"{validity:true,verified:{},error:0,warnings:[2003]}"},
 	{"id":26,"name":"PGP Message - Valid message with Charset header","expectation":"{validity:true,verified:{},error:0,warnings:[2003]}"}
 ]
