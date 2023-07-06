@@ -22,6 +22,24 @@ $(function () {
     load_key();
 });
 
+$(document).ready(function() {
+    // A PGP-message to verify can be passed using the URL parameter "message"
+    // If present, load it.
+    
+    // Use the #hash instead of GET parameters, so that servers cannot issue "414 Too long request"
+    let parameters = location.hash.substr(1).split("&");
+
+    let message_parameter = "message";
+    let message = parameters.find(p => p.startsWith(message_parameter + "="));
+
+    if (message !== undefined) {
+	message = message.substr(message_parameter.length + 1);
+	message = decodeURIComponent(message);
+
+	$("#input_text").val(message);
+    }
+});
+
 function preload_wait() {
     $('#loadcover').show();
 }
